@@ -1,3 +1,41 @@
-main
-*~
+# Compiled source #
+###################
 *.o
+*.a
+*.so
+*.lo
+
+# Executables #
+################
+*.exe
+build/*
+
+# Object files #
+################
+*.obj
+*.elf
+
+# Debug files #
+################
+*.gdb
+*.core
+
+# Temporary files #
+###################
+*~
+*.tmp
+
+# Editor files #
+################
+*.bak
+*.swp
+
+# IDE files #
+################
+.vscode/
+*.vscode/
+.fleet/
+
+# Other #
+################
+.DS_Store
