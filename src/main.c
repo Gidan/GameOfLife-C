@@ -62,8 +62,6 @@ int main(void) {
     EndDrawing();
     if (gameStarted == TRUE) {
       if (frameCount == 0) {
-        printf("Updating grid data\n");
-        //update logic
         for (int y = 0; y < gridHeight; y++) {
           for (int x = 0; x < gridWidth; x++) {
             int aliveNeighbors = countLiveNeighbors(grid, x, y);
@@ -87,6 +85,7 @@ int main(void) {
             }
           }
         }
+
         for (int y = 0; y < gridHeight; y++) {
           for (int x = 0; x < gridWidth; x++) {
             grid[y][x].alive = grid[y][x].candidateToAlive;
@@ -119,6 +118,8 @@ int main(void) {
   }
 
   CloseWindow();
+
+  free(grid);
     
   return 0;
 }
@@ -153,7 +154,7 @@ void drawGridLines() {
 void drawCells(Cell** grid) {
   for (int y = 0; y < gridHeight; y++) {
     for (int x = 0; x < gridWidth; x++) {
-      if (grid[y][x].alive == TRUE) {
+      if (grid[y][x].alive) {
         DrawRectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, RED);
       } 
     }
