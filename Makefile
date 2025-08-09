@@ -10,7 +10,7 @@ BUILDDIR = build
 TARGET = $(BUILDDIR)/game_of_life
 
 # Source files
-SRCS = ./src/main.c
+SRCS = $(wildcard ./src/*.c)
 
 # Object files
 OBJS = $(SRCS:.c=.o)

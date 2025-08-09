@@ -1,9 +1,13 @@
 #include <stdio.h>
-#include "raylib.h"
+#include "../include/raylib.h"
 #include <stdlib.h>
+#include "ui.h"
 
 #define TRUE 1
 #define FALSE 0
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 450
+#define CELL_SIZE 25
 
 typedef struct {
   int alive;
@@ -14,15 +18,14 @@ void drawGridLines();
 void drawCells(Cell** grid);
 int countLiveNeighbors(Cell** grid, int x, int y);
 void addGlide(Cell** grid, int startX, int startY);
+void reset_grid(Cell **grid);
 
-const int screenWidth = 800;
-const int screenHeight = 450;
-const int cellSize = 25;
-const int gridWidth = screenWidth / cellSize;
-const int gridHeight = screenHeight / cellSize;
+const int gridWidth = SCREEN_WIDTH / CELL_SIZE;
+const int gridHeight = SCREEN_HEIGHT / CELL_SIZE;
+
+short ui_mode = UI_MODE_DARK;
 
 int main(void) {
-
   Cell **grid = (Cell **)malloc(gridHeight * sizeof(Cell *));
   if (grid == NULL) {
     fprintf(stderr, "Memory allocation failed\n");
@@ -35,21 +38,23 @@ int main(void) {
       return 1;
     }
   }
-
-  addGlide(grid, 10, 4);
   
-  InitWindow(screenWidth, screenHeight, "Game of Life");
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Game of Life");
   SetTargetFPS(60);
 
   const int skipFrameUpdateGrid = 5;
   int frameCount = 0;
   int gameStarted = 0;
   
+  reset_grid(grid);
+
   while (!WindowShouldClose()) {
     frameCount = (frameCount + 1) % skipFrameUpdateGrid;
     
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+
+    Color background = ui_mode == UI_MODE_LIGHT ? BACKGROUND_COLOR_LIGHT: BACKGROUND_COLOR_DARK;
+    ClearBackground(background);
    
     drawCells(grid);
     drawGridLines();
@@ -89,14 +94,23 @@ int main(void) {
           }
         }
       }
+
+      if (IsKeyPressed(KEY_ENTER)) {
+        gameStarted = FALSE;
+        reset_grid(grid);
+      }
+
     } else {
-      if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+      if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
         int mouseX = GetMouseX();
         int mouseY = GetMouseY();
-        printf("Mouse clicked x:%d  y:%d", mouseX, mouseY);
-        int cellX = mouseX / cellSize;
-        int cellY = mouseY / cellSize;
-        grid[cellY][cellX].alive = TRUE;
+        int cellX = mouseX / CELL_SIZE;
+        int cellY = mouseY / CELL_SIZE;
+        if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+          grid[cellY][cellX].alive = FALSE;
+        } else {
+          grid[cellY][cellX].alive = TRUE;
+        }
       }
       if (IsKeyPressed(KEY_ENTER)) {
         gameStarted = TRUE;
@@ -126,11 +140,12 @@ void drawGridLines() {
   for (int y = 0; y < gridHeight; y++) {
     for (int x = 0; x < gridWidth; x++) {
       Rectangle rect;
-      rect.x = x * cellSize;
-      rect.y = y * cellSize;
-      rect.width = cellSize;
-      rect.height = cellSize;
-      DrawRectangleLinesEx(rect, 1, BLACK); 
+      rect.x = x * CELL_SIZE;
+      rect.y = y * CELL_SIZE;
+      rect.width = CELL_SIZE;
+      rect.height = CELL_SIZE;
+      Color color = ui_mode == UI_MODE_LIGHT ? GRIDLINE_COLOR_LIGHT : GRIDLINE_COLOR_DARK;
+      DrawRectangleLinesEx(rect, 1, color);
     }
   }
 }
@@ -139,7 +154,7 @@ void drawCells(Cell** grid) {
   for (int y = 0; y < gridHeight; y++) {
     for (int x = 0; x < gridWidth; x++) {
       if (grid[y][x].alive == TRUE) {
-        DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, RED);
+        DrawRectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, RED);
       } 
     }
   }
@@ -165,4 +180,15 @@ int countLiveNeighbors(Cell** grid, int x, int y) {
 
   return liveNeighbors;
 }
+
+void reset_grid(Cell **grid) {
+  for (int y = 0; y < gridHeight; y++) {
+    for (int x = 0; x < gridWidth; x++) {
+      grid[y][x].alive = FALSE;
+      grid[y][x].candidateToAlive = FALSE;
+    }
+  }
   
+  addGlide(grid, 10, 4);
+}
+
