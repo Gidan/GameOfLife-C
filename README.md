@@ -21,3 +21,7 @@ Click on the grid to make cells be alive.
 When ready, hit ENTER on your keyboard to start the game.
 
 Hit ENTER again to reset and play again.
+
+## Screenshots
+
+![screenshot.png](screenshots/screenshot.png)
